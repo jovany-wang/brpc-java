@@ -75,11 +75,11 @@ public class BenchmarkTest {
             System.exit(1);
         }
 
-        SendInfo[] sendInfos = new SendInfo[threadNum];
+        SendInfo[] sendInfo = new SendInfo[threadNum];
         Thread[] threads = new Thread[threadNum];
         for (int i = 0; i < threadNum; i++) {
-            sendInfos[i] = new SendInfo();
-            threads[i] = new Thread(new ThreadTask(rpcClient, echoService, messageBytes, sendInfos[i]),
+            sendInfo[i] = new SendInfo();
+            threads[i] = new Thread(new ThreadTask(rpcClient, echoService, messageBytes, sendInfo[i]),
                     "work-thread-" + i);
             threads[i].start();
         }
@@ -103,10 +103,10 @@ public class BenchmarkTest {
             long failNum = 0;
             long elapseNs = 0;
             long averageElapsedNs = 0;
-            for (SendInfo sendInfo : sendInfos) {
-                successNum += sendInfo.successRequestNum;
-                failNum += sendInfo.failRequestNum;
-                elapseNs += sendInfo.elapsedNs;
+            for (SendInfo item : sendInfo) {
+                successNum += item.successRequestNum;
+                failNum += item.failRequestNum;
+                elapseNs += item.elapsedNs;
             }
             if (successNum - lastSuccessRequestNum > 0) {
                 averageElapsedNs = (elapseNs - lastElapsedNs) / (successNum - lastSuccessRequestNum);
