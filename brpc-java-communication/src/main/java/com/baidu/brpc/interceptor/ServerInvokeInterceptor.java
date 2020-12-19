@@ -22,6 +22,8 @@ import com.baidu.brpc.protocol.Response;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 public class ServerInvokeInterceptor extends AbstractInterceptor {
@@ -29,7 +31,13 @@ public class ServerInvokeInterceptor extends AbstractInterceptor {
     @Override
     public void aroundProcess(Request request, Response response, InterceptorChain chain) throws RpcException {
         try {
-            response.setResult(request.getTargetMethod().invoke(request.getTarget(), request.getArgs()));
+            Method methodToBeInvoked = request.getTargetMethod();
+            if (methodToBeInvoked.getReturnType().equals(CompletableFuture.class)) {
+                // 异步 server
+
+            } else {
+                response.setResult(methodToBeInvoked.invoke(request.getTarget(), request.getArgs()));
+            }
         } catch (InvocationTargetException ex) {
             Throwable targetException = ex.getTargetException();
             if (targetException == null) {
